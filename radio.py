@@ -79,11 +79,15 @@ class Radio:
             tracks_uris.append(track['track']['uri'])
         return tracks_info, tracks_uris
 
+    def get_cover_url(self):
+        return self.sp.currently_playing()['item']['album']['images'][0]['url']
+
     def run_in_terminal(self):
         playlist_idx = self.picker(self.get_playlists())
         tracks_info, tracks_uris = self.get_tracks(playlist_idx)
         start_idx = self.picker(tracks_info)
         self.play(start_idx, tracks_uris)
+        print(self.get_cover_url())
         self.control()
 
 
