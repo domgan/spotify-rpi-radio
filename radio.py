@@ -6,20 +6,29 @@ from simple_term_menu import TerminalMenu
 import requests
 import json
 from pprint import pprint
+from collections import deque
 
 def picker(names: list):
     terminal_menu = TerminalMenu(names)
     return terminal_menu.show()
 
-def play(track_id: str):
+def play(start_idx, tracks_uris: list):
     device_id = get_device_id()
-    sp.start_playback(device_id=device_id, uris=['spotify:track:' + track_id])
-    control(track_id, device_id)
 
-def control(track_id: str, device_id):
+    deq = deque(tracks_uris)
+    deq.rotate(-start_idx)
+    tracks_uris = list(deq)
+
+    #tracks_uris = ['spotify:track:' + tr_id for tr_id in tracks_ids]
+    sp.start_playback(device_id=device_id, uris=tracks_uris)
+    control()
+
+def control():
     while True:
+        uri = sp.currently_playing()['item']['uri']
         print('Commands: volume | next | resume | pause.')
         inp = input('Command: ')
+        device_id = get_device_id()
         if inp == 'volume':
             sp.volume(int(input('From 0 to 100: ')), device_id=device_id)
         elif inp == 'next':
@@ -27,7 +36,7 @@ def control(track_id: str, device_id):
         elif inp == 'pause':
             sp.pause_playback(device_id=device_id)
         elif inp == 'resume':
-            sp.start_playback(device_id=device_id, uris=['spotify:track:' + track_id])
+            sp.start_playback(device_id=device_id, uris=[uri])
 
 def get_device_id():
     devices = sp.devices()
@@ -52,16 +61,17 @@ for playlist in playlists:
 idx = picker(playlists_names)
 
 playlist_id = playlists[idx]['id']
+context_uri = playlists[idx]['uri']
 tracks = sp.playlist(playlist_id)['tracks']['items']
-tracks_info = []
+tracks_info, tracks_uris = [], []
 for track in tracks:
     name = track['track']['name']
     artist = track['track']['artists'][0]['name']
     album = track['track']['album']['name']
     tracks_info.append(' \| '.join([name, artist, album]))
+    tracks_uris.append(track['track']['uri'])
 
-idx = picker(tracks_info)
-track_id = tracks[idx]['track']['id']
+start_idx = picker(tracks_info)
 
-play(track_id)
+play(start_idx, tracks_uris)
 
