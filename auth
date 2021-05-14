@@ -1,0 +1,3 @@
+export SPOTIPY_CLIENT_ID='<input yours client_id>'
+export SPOTIPY_CLIENT_SECRET='<input yours secret>'
+export SPOTIPY_REDIRECT_URI='<input yours uri>'
