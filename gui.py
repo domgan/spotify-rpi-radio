@@ -18,9 +18,10 @@ size = (250, 250)
 image = image_obj(url)
 
 sg.theme('DarkBlack1')
-layout = [[sg.Image(data=image, key='-IMAGE-')]]
+central_column = [[sg.Image(data=image, key='-IMAGE-')]]
+layout = [[sg.Column(central_column, justification='center')]]
 # Create the Window
-window = sg.Window('Window Title', layout, size=(800, 800))
+window = sg.Window('Window Title', layout, size=(250*3, 400))
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
     event, values = window.read()
