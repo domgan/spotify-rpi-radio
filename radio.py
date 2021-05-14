@@ -25,7 +25,6 @@ def play(start_idx, tracks_uris: list):
 
 def control():
     while True:
-        timestamp = sp.currently_playing()['timestamp']
         progress = sp.currently_playing()['progress_ms']
         uri = sp.currently_playing()['item']['uri']
         print('Commands: volume | next | resume | pause.')
