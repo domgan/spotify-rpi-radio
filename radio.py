@@ -25,6 +25,8 @@ def play(start_idx, tracks_uris: list):
 
 def control():
     while True:
+        timestamp = sp.currently_playing()['timestamp']
+        progress = sp.currently_playing()['progress_ms']
         uri = sp.currently_playing()['item']['uri']
         print('Commands: volume | next | resume | pause.')
         inp = input('Command: ')
@@ -36,7 +38,7 @@ def control():
         elif inp == 'pause':
             sp.pause_playback(device_id=device_id)
         elif inp == 'resume':
-            sp.start_playback(device_id=device_id, uris=[uri])
+            sp.start_playback(device_id=device_id, uris=[uri], position_ms=progress)
 
 def get_device_id():
     devices = sp.devices()
