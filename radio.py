@@ -3,76 +3,89 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import subprocess
 import sys
 from simple_term_menu import TerminalMenu
-import requests
-import json
 from pprint import pprint
 from collections import deque
 
-def picker(names: list):
-    terminal_menu = TerminalMenu(names)
-    return terminal_menu.show()
 
-def play(start_idx, tracks_uris: list):
-    device_id = get_device_id()
+class Radio:
+    def __init__(self):
+        auth_manager = SpotifyClientCredentials()
+        self.sp = spotipy.Spotify(auth_manager=auth_manager)
+        self.device_id = self.get_device_id()
+        try:
+            self.username = sys.argv[1]
+        except IndexError:
+            self.username = input('Username: ')
+        self.playlists_obj = self.sp.user_playlists(self.username)['items']
 
-    deq = deque(tracks_uris)
-    deq.rotate(-start_idx)
-    tracks_uris = list(deq)
+    def picker(self, names: list):
+        terminal_menu = TerminalMenu(names)
+        return terminal_menu.show()
 
-    #tracks_uris = ['spotify:track:' + tr_id for tr_id in tracks_ids]
-    sp.start_playback(device_id=device_id, uris=tracks_uris)
-    control()
+    def play(self, start_idx, tracks_uris: list):
+        deq = deque(tracks_uris)
+        deq.rotate(-start_idx)
+        tracks_uris = list(deq)
 
-def control():
-    while True:
-        progress = sp.currently_playing()['progress_ms']
-        uri = sp.currently_playing()['item']['uri']
-        print('Commands: volume | next | resume | pause.')
-        inp = input('Command: ')
-        device_id = get_device_id()
-        if inp == 'volume':
-            sp.volume(int(input('From 0 to 100: ')), device_id=device_id)
-        elif inp == 'next':
-            sp.next_track(device_id=device_id)
-        elif inp == 'pause':
-            sp.pause_playback(device_id=device_id)
-        elif inp == 'resume':
-            sp.start_playback(device_id=device_id, uris=[uri], position_ms=progress)
+        #tracks_uris = ['spotify:track:' + tr_id for tr_id in tracks_ids]
+        self.sp.start_playback(device_id=self.device_id, uris=tracks_uris)
 
-def get_device_id():
-    devices = sp.devices()
-    for device in devices['devices']:
-        if 'raspotify' in device['name']:
-            return device['id']
-    raise Exception('Device raspotify not found')
+    def control(self):
+        while True:
+            curr = self.sp.currently_playing()
+            progress = curr['progress_ms']
+            uri = curr['item']['uri']
 
-auth_manager = SpotifyClientCredentials()
-sp = spotipy.Spotify(auth_manager=auth_manager)
+            print('Commands: volume | next | resume | pause | stop.')
+            inp = input('Command: ')
+            if inp == 'volume':
+                self.sp.volume(int(input('From 0 to 100: ')), device_id=self.device_id)
+            elif inp == 'next':
+                self.sp.next_track(device_id=self.device_id)
+            elif inp == 'pause':
+                self.sp.pause_playback(device_id=self.device_id)
+            elif inp == 'resume':
+                self.sp.start_playback(device_id=self.device_id, uris=[uri], position_ms=progress)
+            elif inp == 'stop':
+                self.sp.pause_playback(device_id=self.device_id)
+                break
 
-try:
-    username = sys.argv[1]
-except IndexError:
-    username = input('Username: ')
+    def get_device_id(self):
+        try:
+            devices = self.sp.devices()
+        except:
+            raise Exception('Need new .cache file')
+        for device in devices['devices']:
+            if 'raspotify' in device['name']:
+                return device['id']
+        raise Exception('Device raspotify not found')
 
-playlists = sp.user_playlists(username)['items']
-playlists_names = []
-for playlist in playlists:
-    playlists_names.append(playlist['name'])
+    def get_playlists(self):
+        playlists_names = []
+        for playlist in self.playlists_obj:
+            playlists_names.append(playlist['name'])
+        return playlists_names
 
-idx = picker(playlists_names)
+    def get_tracks(self, playlist_idx):
+        playlist_id = self.playlists_obj[playlist_idx]['id']
+        context_uri = self.playlists_obj[playlist_idx]['uri']
+        tracks = self.sp.playlist(playlist_id)['tracks']['items']
+        tracks_info, tracks_uris = [], []
+        for track in tracks:
+            name = track['track']['name']
+            artist = track['track']['artists'][0]['name']
+            album = track['track']['album']['name']
+            tracks_info.append(' \| '.join([name, artist, album]))
+            tracks_uris.append(track['track']['uri'])
+        return tracks_info, tracks_uris
 
-playlist_id = playlists[idx]['id']
-context_uri = playlists[idx]['uri']
-tracks = sp.playlist(playlist_id)['tracks']['items']
-tracks_info, tracks_uris = [], []
-for track in tracks:
-    name = track['track']['name']
-    artist = track['track']['artists'][0]['name']
-    album = track['track']['album']['name']
-    tracks_info.append(' \| '.join([name, artist, album]))
-    tracks_uris.append(track['track']['uri'])
+    def run_in_terminal(self):
+        playlist_idx = self.picker(self.get_playlists())
+        tracks_info, tracks_uris = self.get_tracks(playlist_idx)
+        start_idx = self.picker(tracks_info)
+        self.play(start_idx, tracks_uris)
+        self.control()
 
-start_idx = picker(tracks_info)
 
-play(start_idx, tracks_uris)
-
+radio = Radio()
+radio.run_in_terminal()
