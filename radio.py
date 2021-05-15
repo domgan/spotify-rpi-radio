@@ -92,7 +92,7 @@ class Radio:
         self.control()
 
 
-# if __name__ == 'main':
-radio = Radio()
-radio.run_in_terminal()
+if __name__ == 'main':
+    radio = Radio()
+    radio.run_in_terminal()
 
