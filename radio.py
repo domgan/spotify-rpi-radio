@@ -7,16 +7,18 @@ from pprint import pprint
 from collections import deque
 
 
+### Create Radio for current user if "username" not specified.
+
+
 class Radio:
-    def __init__(self):
+    def __init__(self, username=None):
         auth_manager = SpotifyClientCredentials()
         self.sp = spotipy.Spotify(auth_manager=auth_manager)
         self.device_id = self.get_device_id()
-        try:
-            self.username = sys.argv[1]
-        except IndexError:
-            self.username = input('Username: ')
-        self.playlists_obj = self.sp.user_playlists(self.username)['items']
+        if username:
+            self.playlists_obj = self.sp.user_playlists(username)['items']
+        else:
+            self.playlists_obj = self.sp.current_user_playlists()['items']
 
     def picker(self, names: list):
         terminal_menu = TerminalMenu(names)
@@ -87,9 +89,10 @@ class Radio:
         tracks_info, tracks_uris = self.get_tracks(playlist_idx)
         start_idx = self.picker(tracks_info)
         self.play(start_idx, tracks_uris)
-        print(self.get_cover_url())
         self.control()
 
 
+# if __name__ == 'main':
 radio = Radio()
 radio.run_in_terminal()
+
