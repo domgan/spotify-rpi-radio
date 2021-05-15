@@ -5,7 +5,7 @@ import sys
 from simple_term_menu import TerminalMenu
 from pprint import pprint
 from collections import deque
-
+import os
 
 ### Create Radio for current user if "username" not specified.
 
@@ -67,10 +67,11 @@ class Radio:
         raise Exception('Device raspotify not found')
 
     def get_playlists(self):
-        playlists_names = []
+        playlists_names, playlists_covers = [], []
         for playlist in self.playlists_obj:
+            playlists_covers.append(playlist['images'][0]['url'])
             playlists_names.append(playlist['name'])
-        return playlists_names
+        return playlists_names, playlists_covers
 
     def get_tracks(self, playlist_idx):
         playlist_id = self.playlists_obj[playlist_idx]['id']
@@ -89,7 +90,7 @@ class Radio:
         return self.sp.currently_playing()['item']['album']['images'][0]['url']
 
     def run_in_terminal(self):
-        playlist_idx = self.picker(self.get_playlists())
+        playlist_idx = self.picker(self.get_playlists()[0])
         tracks_info, tracks_uris = self.get_tracks(playlist_idx)
         start_idx = self.picker(tracks_info)
         self.play(start_idx, tracks_uris)
