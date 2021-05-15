@@ -16,8 +16,8 @@ def image_obj(url):
     return img_byte_arr.getvalue()
 
 
-#radio = Radio()
-#playlists = radio.get_playlists()
+radio = Radio()
+playlists = radio.get_playlists()
 #tracks_info, tracks_uris = radio.get_tracks(playlist_idx)
 
 
@@ -33,7 +33,9 @@ right_column = [[sg.Button('Vol-')], [sg.Button('Vol+')]]
 
 layout = [[sg.Column(left_column, justification='left'),
     sg.Column(central_column, justification='center'),
-    sg.Column(right_column, justification='right')]]
+    sg.Column(right_column, justification='right')],
+    
+    [sg.Listbox(values=playlists, size=(60, 20))]]
 
 # Create the Window
 window = sg.Window('Window Title', layout, size=(250*3, 400))

@@ -56,6 +56,10 @@ class Radio:
         try:
             devices = self.sp.devices()
         except:
+            try:
+                os.remove('.cache')
+            except FileNotFoundError:
+                pass
             raise Exception('Need new .cache file')
         for device in devices['devices']:
             if 'raspotify' in device['name']:
@@ -92,7 +96,7 @@ class Radio:
         self.control()
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     radio = Radio()
     radio.run_in_terminal()
 
