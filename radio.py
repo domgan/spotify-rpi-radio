@@ -17,8 +17,10 @@ class Radio:
         self.device_id = self.get_device_id()
         if username:
             self.playlists_obj = self.sp.user_playlists(username)['items']
+            self.username = username
         else:
             self.playlists_obj = self.sp.current_user_playlists()['items']
+            # self.username = auth_manager.username # TODO
 
     def picker(self, names: list):
         terminal_menu = TerminalMenu(names)
