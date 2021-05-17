@@ -34,6 +34,19 @@ class Radio:
         #tracks_uris = ['spotify:track:' + tr_id for tr_id in tracks_ids]
         self.sp.start_playback(device_id=self.device_id, uris=tracks_uris)
 
+    def resume(self, uri, progress=0):
+        self.sp.start_playback(device_id=self.device_id, uris=[uri], position_ms=progress)
+
+    def pause(self):
+        self.sp.pause_playback(device_id=self.device_id)
+
+    def set_volume(self, vol):
+        self.sp.volume(int(vol), device_id=self.device_id)
+
+    def get_progress(self):
+        curr = self.sp.currently_playing()
+        return curr['progress_ms']
+
     def control(self):
         while True:
             curr = self.sp.currently_playing()
@@ -47,9 +60,9 @@ class Radio:
             elif inp == 'next':
                 self.sp.next_track(device_id=self.device_id)
             elif inp == 'pause':
-                self.sp.pause_playback(device_id=self.device_id)
+                self.pause()
             elif inp == 'resume':
-                self.sp.start_playback(device_id=self.device_id, uris=[uri], position_ms=progress)
+                self.resume(uri, progress)
             elif inp == 'stop':
                 self.sp.pause_playback(device_id=self.device_id)
                 break
