@@ -75,18 +75,21 @@ class Radio:
             playlists_names.append(playlist['name'])
         return playlists_names, playlists_covers
 
-    def get_tracks(self, playlist_idx):
+    def get_tracks(self, playlist_idx, escape=True):
         playlist_id = self.playlists_obj[playlist_idx]['id']
         context_uri = self.playlists_obj[playlist_idx]['uri']
         tracks = self.sp.playlist(playlist_id)['tracks']['items']
-        tracks_info, tracks_uris = [], []
+        tracks_info, tracks_uris, tracks_covers = [], [], []
         for track in tracks:
             name = track['track']['name']
             artist = track['track']['artists'][0]['name']
             album = track['track']['album']['name']
             tracks_info.append(' \| '.join([name, artist, album]))
             tracks_uris.append(track['track']['uri'])
-        return tracks_info, tracks_uris
+            tracks_covers.append(track['track']['album']['images'][0]['url'])
+        if not escape:
+            tracks_info = [info.replace('\|', '|') for info in tracks_info]
+        return tracks_info, tracks_uris, tracks_covers
 
     def get_cover_url(self):
         return self.sp.currently_playing()['item']['album']['images'][0]['url']
