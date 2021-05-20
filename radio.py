@@ -109,7 +109,7 @@ class Radio:
 
     def run_in_terminal(self):
         playlist_idx = self.picker(self.get_playlists()[0])
-        tracks_info, tracks_uris = self.get_tracks(playlist_idx)
+        tracks_info, tracks_uris, _ = self.get_tracks(playlist_idx)
         start_idx = self.picker(tracks_info)
         self.play(start_idx, tracks_uris)
         self.control()
