@@ -1,0 +1,4 @@
+spotipy
+simple_term_menu
+pysimplegui
+pillow
