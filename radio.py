@@ -53,7 +53,7 @@ class Radio:
             progress = curr['progress_ms']
             uri = curr['item']['uri']
 
-            commands = ['volume', 'next', 'resume', 'pause', 'stop']
+            commands = ['volume', 'next', 'resume', 'pause', '--back--', '---stop---']
             idx = self.picker(commands)
             inp = commands[idx]
             if inp == 'volume':
@@ -66,9 +66,11 @@ class Radio:
                 self.pause()
             elif inp == 'resume':
                 self.resume(uri, progress)
-            elif inp == 'stop':
+            elif inp == '--back--':
+                return inp
+            elif inp == '---stop---':
                 self.sp.pause_playback(device_id=self.device_id)
-                break
+                exit()
 
     def get_device_id(self):
         try:
@@ -111,11 +113,18 @@ class Radio:
         return self.sp.currently_playing()['item']['album']['images'][0]['url']
 
     def run_in_terminal(self):
-        playlist_idx = self.picker(self.get_playlists()[0])
-        tracks_info, tracks_uris, _ = self.get_tracks(playlist_idx)
-        start_idx = self.picker(tracks_info)
-        self.play(start_idx, tracks_uris)
-        self.control()
+        playlists, _ = self.get_playlists()
+        while True:
+            playlist_idx = self.picker(playlists)
+            tracks_info, tracks_uris, _ = self.get_tracks(playlist_idx)
+            tracks_info += ['--back--']
+            start_idx = self.picker(tracks_info)
+            if start_idx+1 == len(tracks_info):
+                continue
+            self.play(start_idx, tracks_uris)
+            out = self.control()
+            if out == '--back--':
+                continue
 
 
 if __name__ == '__main__':

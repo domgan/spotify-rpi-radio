@@ -25,6 +25,8 @@ while : ; do
 	fi
 	if echo $OUT | grep -q "Exception: Need new .cache file"; then
 		python cache_generator.py
+	elif echo $OUT | grep -q "Exception: Device raspotify not found"; then
+		echo "API is not seeing raspberry device, you need to choose it at desktop app" && exit 1
 	else
 		break
 	fi
