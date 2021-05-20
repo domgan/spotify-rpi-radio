@@ -9,6 +9,7 @@ cd $(dirname $0)
 if [ ! -d venv ]; then
 	echo "First run. Installing virtual enviroment and downloading dependencies..."
 	python3 -m venv venv || exit 1
+	source venv/bin/activate
 	python3 -m pip install -r requirements.txt || exit 1
 fi
 
