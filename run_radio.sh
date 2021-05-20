@@ -5,12 +5,13 @@ if [ ! $# -eq 1 ]; then
 fi
 
 cd $(dirname $0)
+deactivate
 
 if [ ! -d venv ]; then
-	echo "First run. Installing virtual enviroment and downloading dependencies..."
+	echo "First run. Installing virtual environment and downloading dependencies..."
 	python3 -m venv venv || exit 1
 	source venv/bin/activate
-	python3 -m pip install -r requirements.txt || exit 1
+	python -m pip install -r requirements.txt || exit 1
 fi
 
 source venv/bin/activate
