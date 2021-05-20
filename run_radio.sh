@@ -15,7 +15,7 @@ if [ ! -d venv ]; then
 fi
 
 source venv/bin/activate
-cat auth | grep -q "input your" && echo "You need to provide needed keys to 'auth' file"
+cat auth | grep -q "input your" && echo "You need to provide needed keys to 'auth' file" && exit 1
 source auth
 
 while : ; do
