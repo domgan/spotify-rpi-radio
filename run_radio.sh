@@ -5,7 +5,7 @@ if [ ! $# -eq 1 ]; then
 fi
 
 cd $(dirname $0)
-deactivate
+deactivate &>/dev/null
 
 if [ ! -d venv ]; then
 	echo "First run. Installing virtual environment and downloading dependencies..."
@@ -15,6 +15,7 @@ if [ ! -d venv ]; then
 fi
 
 source venv/bin/activate
+cat auth | grep -q "input your" && echo "You need to provide needed keys to 'auth' file"
 source auth
 
 while : ; do
