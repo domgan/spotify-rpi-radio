@@ -53,10 +53,13 @@ class Radio:
             progress = curr['progress_ms']
             uri = curr['item']['uri']
 
-            print('Commands: volume | next | resume | pause | stop.')
-            inp = input('Command: ')
+            commands = ['volume', 'next', 'resume', 'pause', 'stop']
+            idx = self.picker(commands)
+            inp = commands[idx]
             if inp == 'volume':
-                self.sp.volume(int(input('From 0 to 100: ')), device_id=self.device_id)
+                volumes = [0, 25, 50, 75, 100]
+                vol_idx = self.picker([str(vol)+'%' for vol in volumes])
+                self.sp.volume(volumes[vol_idx], device_id=self.device_id)
             elif inp == 'next':
                 self.sp.next_track(device_id=self.device_id)
             elif inp == 'pause':
